@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 # Regex to catch latitude and longitude for Homes
 LAT_LONG_REGEX = r'{\"lat\":\"(\d*.\d*)\",\"lng\":\"(\d*.\d*)\"}'
 
-class ChintaiScrapper(BaseScrapper):
+class HomescoojpScrapper(BaseScrapper):
     def get_coordinates(self):
         lati, longi = 0, 0
         soup = bs(self.return_content(), features='html.parser')
@@ -26,7 +26,7 @@ class ChintaiScrapper(BaseScrapper):
 
 
 if __name__ == "__main__":
-    scrapper = ChintaiScrapper('https://www.homes.co.jp/chintai/b-1438180002881/')
+    scrapper = HomescoojpScrapper('https://www.homes.co.jp/chintai/b-1438180002881/')
     # scrapper.save_as_html()
     # text = scrapper.read_html()
     scrapper.get_coordinates()
