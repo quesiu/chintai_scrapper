@@ -1,13 +1,15 @@
 class Bukken:
     def __init__(self) -> None:
         self._name = ''
-        self._monthly_price = ''
-        self._monthly_mgt_fees = ''
-        self._reikin = ''
-        self._shikikin = ''
+        self._monthly_price = int(0)
+        self._monthly_mgt_fees = int(0)
+        self._extra_fees_in_months = float(0)
         self._coordinates = ('', '')
-        self._surface = ''
+        self._surface = float(0)
         self._closest_stations = ''
+        self._bukken_type = ''
+        self._madori = ''
+        self._age = ''
 
     @property
     def name(self):
@@ -42,20 +44,12 @@ class Bukken:
         self._coordinates = value
 
     @property
-    def reikin(self):
-        return self._reikin
+    def extra_fees_in_months(self):
+        return self._extra_fees_in_months
 
-    @reikin.setter
-    def reikin(self, value):
-        self._reikin = value
-
-    @property
-    def shikikin(self):
-        return self._shikikin
-
-    @shikikin.setter
-    def shikikin(self, value):
-        self._shikikin = value
+    @extra_fees_in_months.setter
+    def extra_fees_in_months(self, value):
+        self._extra_fees_in_months = value
 
     @property
     def surface(self):
@@ -72,3 +66,27 @@ class Bukken:
     @closest_stations.setter
     def closest_stations(self, value):
         self._closest_stations = value
+
+    @property
+    def bukken_type(self):
+        return self._bukken_type
+
+    @bukken_type.setter
+    def bukken_type(self, value):
+        self._bukken_type = value
+
+    @property
+    def madori(self):
+        return self._madori
+
+    @madori.setter
+    def madori(self, value):
+        self._madori = value
+
+    @property
+    def age(self):
+        return self._age
+
+    @age.setter
+    def age(self, value):
+        self._age = value
