@@ -10,11 +10,14 @@ from bs4 import BeautifulSoup as bs
 # except ImportError:
 #     print("Error: no module named 'google' found")
 
+# Header used to simulate request from browser and avoid robot blockers
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
 class BaseScrapper:
     
     def __init__(self, url:str):
         self.url = url
-        self.page = requests.get(url, allow_redirects=True)
+        self.page = requests.get(url, allow_redirects=True, headers=HEADERS)
         self.extract_name_and_ext()
 
     def show_page(self):
@@ -41,5 +44,5 @@ class BaseScrapper:
 
 
 if __name__ == "__main__":
-    scrapper = BaseScrapper('https://google.com')
-    scrapper.download_file()
+    scrapper = BaseScrapper('https://www.homes.co.jp/chintai/b-1438180002881/')
+    scrapper.show_page()
