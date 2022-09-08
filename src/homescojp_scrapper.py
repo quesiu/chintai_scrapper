@@ -8,9 +8,9 @@ from bs4 import BeautifulSoup as bs
 LAT_LONG_REGEX = r'{\"lat\":\"(\d*\.\d*)\",\"lng\":\"(\d*.\d*)\"}'
 PRICE_REGEX = r'<span>(\d+\.?\d*)</span>.+\( (\d+,\d+)'
 EXTRA_FEES_REGEX = r'(\d.?\d?|-)(?:ヶ月)? / (.?\d?|-)(?:ヶ月)?'
-MADORI_REGEX = r'(\d[LDK]+)'
+MADORI_REGEX = r'(\d[SLDK]+)'
 SURFACE_REGEX = r'(\d+\.?\d*)'
-
+# Part of the URL used to add a point to a given place
 GMAPS_URL = r'https://www.google.com/maps/place/'
 
 class HomescoojpScrapper(BaseScrapper):
