@@ -1,4 +1,5 @@
 import re
+from bukken import Bukken
 from typing import Tuple
 from base_scrapper import BaseScrapper
 from bs4 import BeautifulSoup as bs
@@ -7,6 +8,10 @@ from bs4 import BeautifulSoup as bs
 LAT_LONG_REGEX = r'{\"lat\":\"(\d*\.\d*)\",\"lng\":\"(\d*.\d*)\"}'
 PRICE_REGEX = r'<span>(\d+\.?\d*)</span>.+\( (\d+,\d+)'
 EXTRA_FEES_REGEX = r'(\d.?\d?|-)(?:ヶ月)? / (.?\d?|-)(?:ヶ月)?'
+MADORI_REGEX = r'(\d[LDK]+)'
+SURFACE_REGEX = r'(\d+\.?\d*)'
+
+GMAPS_URL = r'https://www.google.com/maps/place/'
 
 class HomescoojpScrapper(BaseScrapper):
     def __init__(self, url: str):
@@ -82,6 +87,15 @@ class HomescoojpScrapper(BaseScrapper):
         Returns:
             str: stations listed with line return as separator
         """
+        stations = ''
+        stations_raw = self.soup.find(id= 'chk-bkc-fulltraffic').find_all("p")
+        for idx, station in enumerate(stations_raw):
+            # Add a line return character
+            stations += f'{station.text}\015'
+            if idx == 2:
+                stations = stations[:-1]
+                break
+        return stations
     
     def scrap_bukken_type(self) -> str:
         """Get bukken type
@@ -89,6 +103,7 @@ class HomescoojpScrapper(BaseScrapper):
         Returns:
             str: type in Japanese
         """
+        return self.soup.find(id='chk-bkh-type').text
 
     def scrap_madori(self) -> str:
         """Get bukken shape (1DK, 3LDK, etc.) which is called madori
@@ -96,6 +111,9 @@ class HomescoojpScrapper(BaseScrapper):
         Returns:
             str: shape
         """
+        madori_raw = self.soup.find(id='chk-bkc-marodi').text
+        madori_res = re.search(MADORI_REGEX, str(madori_raw))
+        return madori_res.group(1)
 
     def scrap_surface(self) -> float:
         """Get surface
@@ -103,6 +121,9 @@ class HomescoojpScrapper(BaseScrapper):
         Returns:
             float: surface in m2
         """
+        surface_raw = self.soup.find(id='chk-bkc-housearea').text
+        surface_res = re.search(SURFACE_REGEX, str(surface_raw))
+        return float(surface_res.group(1))
 
     def scrap_age(self) -> str:
         """Get bukken age
@@ -110,7 +131,28 @@ class HomescoojpScrapper(BaseScrapper):
         Returns:
             str: age in Japanese
         """
+        return self.soup.find(id='chk-bkc-kenchikudate').text
+
+    def scrap_all(self, bukken:Bukken):
+        """Fill up an bukken object with all scrapped
+
+        Args:
+            bukken (Bukken): empty bukken that will be filled (in place)
+        """
+        bukken.name = self.scrap_name()
+        bukken.monthly_price, bukken.monthly_mgt_fees = self.scrap_price()
+        bukken.extra_fees_in_months = self.scrap_other_fees()
+        bukken.coordinates = self.scrap_coordinates()
+        bukken.surface = self.scrap_surface()
+        bukken.closest_stations = self.scrap_closest_stations()
+        bukken.bukken_type = self.scrap_bukken_type()
+        bukken.madori = self.scrap_madori()
+        bukken.age = self.scrap_age()
+        # Create a link to Google Maps using coordinates
+        bukken.gmaps_link = f'{GMAPS_URL}{bukken.coordinates[0]} {bukken.coordinates[1]}'
 
 if __name__ == "__main__":
     scrapper = HomescoojpScrapper('https://www.homes.co.jp/chintai/b-1438180002881/')
-    scrapper.scrap_other_fees()
+    my_bukken = Bukken()
+    scrapper.scrap_all(my_bukken)
+    print(my_bukken)

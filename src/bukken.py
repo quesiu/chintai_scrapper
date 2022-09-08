@@ -10,6 +10,10 @@ class Bukken:
         self._bukken_type = ''
         self._madori = ''
         self._age = ''
+        self._gmaps_link = ''
+
+    def __str__(self) -> str:
+        return f'{self.name} - {self.monthly_price}'
 
     @property
     def name(self):
@@ -90,3 +94,11 @@ class Bukken:
     @age.setter
     def age(self, value):
         self._age = value
+
+    @property
+    def gmaps_link(self):
+        return self._gmaps_link
+
+    @gmaps_link.setter
+    def gmaps_link(self, value):
+        self._gmaps_link = value
