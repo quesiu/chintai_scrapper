@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
@@ -14,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 DATA_TO_PULL = '1b7b5a74pHrAqkd3OdLA83ydJSLutQonDO_Yf-XAWNo0'
 SHEET_RANGE_NAME = 'Test Retool!A:S'
 
-def main():
+def download_spreadsheet():
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
@@ -50,13 +51,15 @@ def main():
             print('No data found.')
             return
 
-        print('Name, Major:')
-        for row in values:
-            # Print columns A and E, which correspond to indices 0 and 4.
-            print('%s, %s' % (row[0], row[4]))
+        df = pd.DataFrame(values)
+        df.to_csv('data.csv')
     except HttpError as err:
         print(err)
 
-
 if __name__ == '__main__':
-    main()
+    # Only run spreadsheet reading if data doesn't exist to avoid unless API calls
+    if not os.path.exists('data.csv'):
+        download_spreadsheet()
+    else:
+        print("file already exists")
+    
