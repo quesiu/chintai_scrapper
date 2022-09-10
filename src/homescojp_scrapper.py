@@ -30,7 +30,7 @@ class HomescoojpScrapper(RealEstateScrapper):
         if coordinates_res:
             lati = coordinates_res.group(1)
             longi = coordinates_res.group(2) 
-        return lati, longi
+        return (lati, longi)
 
     def scrap_name(self) -> str:
         """Get name from Homes.co.jp page
