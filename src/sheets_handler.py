@@ -12,6 +12,7 @@ import bukken
 from enum_priority import Priority
 from realestate_scrapper import RealEstateScrapper
 from homescojp_scrapper import HomescoojpScrapper
+from suumo_scrapper import SuumoScrapper
 import yahoo_norikae_scrap as yns
 from dict_destinations import destinations
 
@@ -79,8 +80,8 @@ class SheetHandler:
     def detect_scrapper(self, link:str) -> RealEstateScrapper:
         if 'homes.co.jp' in link:
             return HomescoojpScrapper
-        elif 'suumo.co.jp' in link:
-            pass
+        elif 'suumo.jp' in link:
+            return SuumoScrapper
         else:
             exit
 
@@ -113,4 +114,5 @@ if __name__ == '__main__':
     sh = SheetHandler()
     sh.initiate_df()
     sh.loop_through_rows()
+    print('Succesfully output data')
     

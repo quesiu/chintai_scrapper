@@ -103,7 +103,8 @@ class SuumoScrapper(RealEstateScrapper):
         if self.monthly_price == 0:
             print("Error, monthly price not correctly output so not possible to calculate fees in months")
         else:
-            total_months = total / self.monthly_price
+            # Convert in JPY and divide by monthly rent
+            total_months = total * 10000 / self.monthly_price
         return total_months
 
     def scrap_closest_stations(self) -> str:
@@ -149,7 +150,8 @@ class SuumoScrapper(RealEstateScrapper):
         return self.soup.find_all('div', class_='property_data-body')[8].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
 
 if __name__ == '__main__':
-    sc = SuumoScrapper('https://suumo.jp/chintai/bc_100296177140/')
+    scrapper = SuumoScrapper('https://suumo.jp/chintai/bc_100296177140/')
     # sc = SuumoScrapper('https://suumo.jp/chintai/jnc_000027743441/?bc=100292549920')
-    # sc.add_slash_url()
-    print(sc.scrap_other_fees())
+    my_bukken = Bukken()
+    scrapper.scrap_all(my_bukken)
+    print(my_bukken)
