@@ -1,8 +1,9 @@
 import re
-from bukken import Bukken
 from typing import Tuple
-from base_scrapper import BaseScrapper
 from bs4 import BeautifulSoup as bs
+
+from bukken import Bukken
+from realestate_scrapper import RealEstateScrapper
 
 # Regex to catch latitude and longitude for Homes
 LAT_LONG_REGEX = r'{\"lat\":\"(\d*\.\d*)\",\"lng\":\"(\d*.\d*)\"}'
@@ -13,7 +14,7 @@ SURFACE_REGEX = r'(\d+\.?\d*)'
 # Part of the URL used to add a point to a given place
 GMAPS_URL = r'https://www.google.com/maps/place/'
 
-class HomescoojpScrapper(BaseScrapper):
+class HomescoojpScrapper(RealEstateScrapper):
     def __init__(self, url: str):
         super().__init__(url)
         self.soup = bs(self.return_content(), features='html.parser')
