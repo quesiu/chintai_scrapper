@@ -17,9 +17,19 @@ class Bukken:
         self._listing_link = ''
 
     def __str__(self) -> str:
+        """Output object as a string
+
+        Returns:
+            str: only gives name and monthly price
+        """
         return f'{self.name} - {self.monthly_price}'
 
     def extract(self) -> List:
+        """Return a list of fully filled items which will be exported to csv/sheet
+
+        Returns:
+            List: all items containted inside the bukken object
+        """
         return [self.name,
                 self.listing_link,
                 self.address_jp,

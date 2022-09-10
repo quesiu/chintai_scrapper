@@ -91,7 +91,7 @@ class HomescoojpScrapper(BaseScrapper):
         stations_raw = self.soup.find(id= 'chk-bkc-fulltraffic').find_all("p")
         for idx, station in enumerate(stations_raw):
             # Add a line return character
-            stations += f'{station.text}\015'
+            stations += f'{station.text} '
             if idx == 2:
                 stations = stations[:-1]
                 break
@@ -149,7 +149,7 @@ class HomescoojpScrapper(BaseScrapper):
         bukken.madori = self.scrap_madori()
         bukken.age = self.scrap_age()
         # Create a link to Google Maps using coordinates
-        bukken.gmaps_link = f'{GMAPS_URL}{bukken.coordinates[0]} {bukken.coordinates[1]}'
+        bukken.gmaps_link = f'{GMAPS_URL}{bukken.coordinates[0]}\n{bukken.coordinates[1]}'
 
 if __name__ == "__main__":
     scrapper = HomescoojpScrapper('https://www.homes.co.jp/chintai/b-1438180002881/')

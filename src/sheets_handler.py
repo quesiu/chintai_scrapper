@@ -67,15 +67,21 @@ class SheetHandler:
         except HttpError as err:
             print(err)
 
-    def initiate_df(self, nb_row_to_skip:int=0):
+    def initiate_df(self):
         if not os.path.exists('data.csv'):
             self.download_spreadsheet()
         else:
             print("file already exists")
-        self.df_base = pd.read_csv('data.csv', header=[0])
+        self.df_base = pd.read_csv('data.csv')
 
 
     def loop_through_rows(self, gmh):
+        # TODO refactor/extract in better way
+        """Go through each row and scrap and calcualte required info
+
+        Args:
+            gmh (GoogleMapsHandler): handler for Google location APIs
+        """
         for row_idx in range(1, len(self.df_base)):
             # Create a new bukken
             current_bukken = bukken.Bukken()
