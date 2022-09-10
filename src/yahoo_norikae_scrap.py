@@ -53,7 +53,7 @@ def get_nb_transfers(soup) -> str:
     Returns:
         str: transfers as a string
     """
-    transfers = soup.select_one("li.transfer").text
+    transfers = soup.select_one("li.transfer")
     # transfers_res = re.search(NORIKAE_REGEX, transfers)
     return transfers
 
