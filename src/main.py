@@ -15,7 +15,9 @@ def fill_sheet_with_info():
 
     sh.initiate_df()
     sh.loop_through_rows(gmh)
-    sh.df_output.to_csv('output.csv')
+    sh.upload_sheet()
+    # sh.df_output.to_csv('output.csv', index=False, header=False)
 
 if __name__ == '__main__':
     fill_sheet_with_info()
+    print('Succesfully output data')

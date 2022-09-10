@@ -1,4 +1,3 @@
-from numbers import Real
 import os.path
 import pandas as pd
 
@@ -7,6 +6,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import df2gspread as d2g
 
 import bukken
 from enum_priority import Priority
@@ -21,8 +21,9 @@ from dict_destinations import destinations
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
-DATA_TO_PULL = '1b7b5a74pHrAqkd3OdLA83ydJSLutQonDO_Yf-XAWNo0'
-SHEET_RANGE_NAME = 'House and info (auto)!A:S'
+SPREADSHEET_ID = '1b7b5a74pHrAqkd3OdLA83ydJSLutQonDO_Yf-XAWNo0'
+INPUT_SHEET_RANGE_NAME = 'House and info (auto)!A:S'
+OUTPUT_SHEET_RANGE_NAME = 'output!A:S'
 
 class SheetHandler:
 
@@ -30,14 +31,7 @@ class SheetHandler:
         self.df_base = pd.DataFrame()
         self.df_output = pd.DataFrame()
 
-    def download_spreadsheet(self):
-        """Shows basic usage of the Sheets API.
-        Prints values from a sample spreadsheet.
-        """
-        creds = None
-        # The file token.json stores the user's access and refresh tokens, and is
-        # created automatically when the authorization flow completes for the first
-        # time.
+    def handle_credentials(self):
         if os.path.exists('token.json'):
             creds = Credentials.from_authorized_user_file('token.json', SCOPES)
         # If there are no (valid) credentials available, let the user log in.
@@ -51,14 +45,25 @@ class SheetHandler:
             # Save the credentials for the next run
             with open('token.json', 'w') as token:
                 token.write(creds.to_json())
+        return creds
+
+    def download_spreadsheet(self):
+        """Shows basic usage of the Sheets API.
+        Prints values from a sample spreadsheet.
+        """
+        creds = None
+        # The file token.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        creds = self.handle_credentials()
 
         try:
             service = build('sheets', 'v4', credentials=creds)
 
             # Call the Sheets API
             sheet = service.spreadsheets()
-            result = sheet.values().get(spreadsheetId=DATA_TO_PULL,
-                                        range=SHEET_RANGE_NAME).execute()
+            result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                        range=INPUT_SHEET_RANGE_NAME).execute()
                                         # ).execute()
             values = result.get('values', [])
 
@@ -67,6 +72,25 @@ class SheetHandler:
                 return
 
             pd.DataFrame(values).to_csv('data.csv')
+        except HttpError as err:
+            print(err)
+
+    def upload_sheet(self):
+        creds = creds = self.handle_credentials()
+
+        try:
+            service = build('sheets', 'v4', credentials=creds)
+
+            # Prepare data to send to Google Sheets
+            data = [self.df_output.columns.values.tolist()]
+            data.extend(self.df_output.values.tolist())
+            value_range_body = {"values": data}
+            request = service.spreadsheets().values().update(spreadsheetId=SPREADSHEET_ID, range=OUTPUT_SHEET_RANGE_NAME, 
+                                                                valueInputOption='INPUT_VALUE_OPTION_UNSPECIFIED', body=value_range_body)
+            response = request.execute()
+
+            # print(response)
+
         except HttpError as err:
             print(err)
 
@@ -111,8 +135,8 @@ class SheetHandler:
 
 if __name__ == '__main__':
     # Only run spreadsheet reading if data doesn't exist to avoid unless API calls
-    sh = SheetHandler()
-    sh.initiate_df()
-    sh.loop_through_rows()
-    print('Succesfully output data')
-    
+    # sh = SheetHandler()
+    # sh.initiate_df()
+    # sh.loop_through_rows()
+    # print('Succesfully output data')
+    pass
