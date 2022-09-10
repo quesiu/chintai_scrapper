@@ -4,3 +4,6 @@ credentials.json
 data.csv
 __pycache__/
 gmaps_apikey
+bing_apikey
+.DS_Store
+yahoo_clientid
