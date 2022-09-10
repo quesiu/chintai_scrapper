@@ -10,11 +10,10 @@ from realestate_scrapper import RealEstateScrapper
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 # Regex to catch latitude and longitude for Homes
-LAT_LONG_REGEX = r'{\"lat\":\"(\d*\.\d*)\",\"lng\":\"(\d*.\d*)\"}'
-PRICE_REGEX = r'    '
-EXTRA_FEES_REGEX = r'(\d.?\d?|-)(?:ヶ月)? / (.?\d?|-)(?:ヶ月)?'
-MADORI_REGEX = r'(\d[SLDK]+)'
-SURFACE_REGEX = r'(\d+\.?\d*)'
+LAT__REGEX = r'"lat": (\d+.\d+)'
+LONG_REGEX = r'"lng": (\d+.\d+)'
+EXTRA_FEES_REGEX = r'(\d+.?\d*万円|-)'
+
 class SuumoScrapper(RealEstateScrapper):
 
     def __init__(self, url: str):
@@ -25,6 +24,7 @@ class SuumoScrapper(RealEstateScrapper):
         url = self.add_slash_url(url)
         page_map = requests.get(f'{url}kankyo/', allow_redirects=False, headers=HEADERS)
         self.map_soup = bs(page_map.content, features='html.parser')
+        self.monthly_price = 0
 
     def add_slash_url(self, url: str) -> str:
         # TODO: Move to tool library
@@ -47,8 +47,8 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             Tuple[str, str]: latitude and longitude in this order
         """
-        lati = re.search(r'"lat": (\d+.\d+)', str(self.map_soup)).group(1)
-        longi = re.search(r'"lng": (\d+.\d+)', str(self.map_soup)).group(1)
+        lati = re.search(LAT__REGEX, str(self.map_soup)).group(1)
+        longi = re.search(LONG_REGEX, str(self.map_soup)).group(1)
         return (lati, longi)
 
     def scrap_name(self) -> str:
@@ -75,25 +75,43 @@ class SuumoScrapper(RealEstateScrapper):
         monthly_price = monthly_price_raw.text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t').rstrip('万円')
         # Cast into int and convert 1万 to 10000JPY
         monthly_price = int(float(monthly_price) * 10000)
+        # Also add monthly price info to calculate extra fees in months
+        self.monthly_price = monthly_price
         # All in one line for monthly fees
         # TODO clean it up, add intermediate function to separate both
-        monthly_fees_raw = self.soup.find('div', class_='property_data-body')
+        monthly_fees_raw = self.soup.find_all('div', class_='property_data-body')[0]
         monthly_fees = int(monthly_fees_raw.text.rstrip('万円').replace('-', '0'))
         return monthly_price, monthly_fees
 
     def scrap_other_fees(self) -> float:
+        # TODO refactor in a better way
         """Get fees such as reikin, shikin, etc. and sum them up
 
         Returns:
             float: extra fees in months
         """
+        total_months = 0
         reikin_shikikin_raw = self.soup.find_all('div', class_='property_data-body')[1].text
-        other_fees_raw = self.soup.find_all('div', class_='property_data-body')[2].text
+        reikin_shikinkin_res = re.search(EXTRA_FEES_REGEX, reikin_shikikin_raw)
+        reikin = float(reikin_shikinkin_res.group(0).rstrip('万円').replace('-','0'))
+        shikikin = float(reikin_shikinkin_res.group(1).rstrip('万円').replace('-','0'))
+        hoken_raw = self.soup.find_all('div', class_='property_data-body')[2].text
+        hoken = float(hoken_raw.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t\t').rstrip('万円').replace('-','0'))
         other_fees_raw = self.soup.find_all('div', class_='property_data-body')[3].text
-        print(1)
-        return 1
+        other_fees = float(other_fees_raw.lstrip('r\n\t\t\t\t\t\t\t\t\t\t\t\t').rstrip('万円').replace('-','0'))
+        total = reikin + shikikin + hoken + other_fees
+        if self.monthly_price == 0:
+            print("Error, monthly price not correctly output so not possible to calculate fees in months")
+        else:
+            total_months = total / self.monthly_price
+        return total_months
 
     def scrap_closest_stations(self) -> str:
+        """Get closest stations
+
+        Returns:
+            str: stations listed with line return as separator
+        """
         stations = ''
         soup_of_stations = self.soup.find_all('div', class_='property_view_detail-body')[2]
         stations_raw = soup_of_stations.find_all('div', class_='property_view_detail-text')
@@ -104,13 +122,28 @@ class SuumoScrapper(RealEstateScrapper):
         return stations
 
     def scrap_bukken_type(self) -> str:
+        """Get bukken type
+
+        Returns:
+            str: type in Japanese
+        """
         return self.soup.find_all('div', class_='property_data-body')[7].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
 
     def scrap_madori(self) -> str:
+        """Get bukken shape (1DK, 3LDK, etc.) which is called madori
+
+        Returns:
+            str: shape
+        """
         return self.soup.find_all('div', class_='property_data-body')[4].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
 
     def scrap_surface(self) -> float:
-        return self.soup.find_all('div', class_='property_data-body')[5].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        """Get surface
+
+        Returns:
+            float: surface in m2
+        """
+        return float(self.soup.find_all('div', class_='property_data-body')[5].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t').rstrip('m2'))
     
     def scrap_age(self) -> str:
         return self.soup.find_all('div', class_='property_data-body')[8].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
@@ -119,4 +152,4 @@ if __name__ == '__main__':
     sc = SuumoScrapper('https://suumo.jp/chintai/bc_100296177140/')
     # sc = SuumoScrapper('https://suumo.jp/chintai/jnc_000027743441/?bc=100292549920')
     # sc.add_slash_url()
-    print(sc.scrap_closest_stations())
+    print(sc.scrap_other_fees())
