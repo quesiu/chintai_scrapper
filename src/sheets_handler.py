@@ -19,7 +19,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
 DATA_TO_PULL = '1b7b5a74pHrAqkd3OdLA83ydJSLutQonDO_Yf-XAWNo0'
-SHEET_RANGE_NAME = 'Test Retool!A:S'
+SHEET_RANGE_NAME = 'House and info (auto)!A:S'
 
 class SheetHandler:
 
