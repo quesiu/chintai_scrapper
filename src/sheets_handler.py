@@ -1,3 +1,4 @@
+from numbers import Real
 import os.path
 import pandas as pd
 
@@ -9,7 +10,8 @@ from googleapiclient.errors import HttpError
 
 import bukken
 from enum_priority import Priority
-from homescojp_scrapper import HomescoojpScrapper as scrapper
+from realestate_scrapper import RealEstateScrapper
+from homescojp_scrapper import HomescoojpScrapper
 import yahoo_norikae_scrap as yns
 from dict_destinations import destinations
 
@@ -74,6 +76,13 @@ class SheetHandler:
             print("file already exists")
         self.df_base = pd.read_csv('data.csv')
 
+    def detect_scrapper(self, link:str) -> RealEstateScrapper:
+        if 'homes.co.jp' in link:
+            return HomescoojpScrapper
+        elif 'suumo.co.jp' in link:
+            pass
+        else:
+            exit
 
     def loop_through_rows(self, gmh):
         # TODO refactor/extract in better way
@@ -87,6 +96,7 @@ class SheetHandler:
             current_bukken = bukken.Bukken()
             # Get link from sheet (index 2)
             link = self.df_base.iloc[row_idx][2]
+            scrapper = self.detect_scrapper(link) 
             current_bukken.listing_link = link
             # Fill bukken with scrapping data
             scrapper(link).scrap_all(current_bukken)
