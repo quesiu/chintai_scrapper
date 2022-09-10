@@ -91,9 +91,11 @@ class HomescoojpScrapper(RealEstateScrapper):
         for idx, station in enumerate(stations_raw):
             # Add a line return character
             stations += f'{station.text}\n'
-            if idx == 2:
-                stations = stations[:-1]
-                break
+            # if idx == 2:
+            #     stations = stations[:-1]
+            #     break
+        # Remove last line return
+        stations = stations[:-1]
         return stations
     
     def scrap_bukken_type(self) -> str:
