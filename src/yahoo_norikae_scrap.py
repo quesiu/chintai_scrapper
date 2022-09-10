@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup as bs
 import urllib.parse # URLエンコード、デコード
 import re
 
-# NORIKAE_REGEX = r'(\d+)'
+NORIKAE_REGEX = r'(\d+)'
 TIME_REGEX = r'.+着(.+)'
 
 # Headers to avoid bot anti-spam
@@ -53,9 +53,9 @@ def get_nb_transfers(soup) -> str:
     Returns:
         str: transfers as a string
     """
-    transfers = soup.select_one("li.transfer")
-    # transfers_res = re.search(NORIKAE_REGEX, transfers)
-    return transfers
+    transfers = soup.select_one("li.transfer").text
+    transfers_res = re.search(NORIKAE_REGEX, transfers)
+    return f'乗換:{int(transfers_res.group(1))}'
 
 def get_total_time(soup) -> str:
     """Get total amount of time the commute takes from parsed Yahoo Norikae Annai page
