@@ -11,6 +11,7 @@ class Bukken:
         self._madori = ''
         self._age = ''
         self._gmaps_link = ''
+        self._address_jp = ''
 
     def __str__(self) -> str:
         return f'{self.name} - {self.monthly_price}'
@@ -102,3 +103,11 @@ class Bukken:
     @gmaps_link.setter
     def gmaps_link(self, value):
         self._gmaps_link = value
+
+    @property
+    def address_jp(self):
+        return self._address_jp
+
+    @address_jp.setter
+    def address_jp(self, value):
+        self._address_jp = value
