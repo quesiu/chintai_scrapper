@@ -6,7 +6,7 @@ from enum_priority import Priority
 LANG_JP = 'ja'
 LANG_EN = 'en'
 
-class GoogleMapsHandler():
+class GoogleMapsHandler:
     def __init__(self) -> None:
         filename = 'gmaps_apikey'
         api_key = self.get_file_contents(filename)
