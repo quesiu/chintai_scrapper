@@ -31,6 +31,9 @@ class GoogleMapsHandler:
         except FileNotFoundError:
             print("'%s' file not found" % filename)
 
+    def reverse_geocode_jp(self, coordinates:str) -> str:
+        return self.gmaps.reverse_geocode(coordinates, language=LANG_JP)[0]['formatted_address']
+
 
 if __name__ == '__main__':
     gmh = GoogleMapsHandler()

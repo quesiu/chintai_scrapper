@@ -54,7 +54,7 @@ class HomescoojpScrapper(BaseScrapper):
         price_res = re.search(PRICE_REGEX, str(price_raw))
         if price_res:
             # Cast into int and convert 1万 to 10000JPY
-            monthly_price = int(price_res.group(1)) * 10000
+            monthly_price = int(float(price_res.group(1)) * 10000)
             # Replace comma used as separator for monthly fees, cast into int
             monthly_fees = int(price_res.group(2).replace(',', ''))
         return monthly_price, monthly_fees

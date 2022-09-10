@@ -1,3 +1,5 @@
+from typing import List
+
 class Bukken:
     def __init__(self) -> None:
         self._name = ''
@@ -12,9 +14,20 @@ class Bukken:
         self._age = ''
         self._gmaps_link = ''
         self._address_jp = ''
+        self._listing_link = ''
 
     def __str__(self) -> str:
         return f'{self.name} - {self.monthly_price}'
+
+    def extract(self) -> List:
+        return [self.name,
+                self.listing_link,
+                self.address_jp,
+                self.gmaps_link,
+                f'={self.monthly_price}*(24+4+{self.extra_fees_in_months})/24+{self.monthly_mgt_fees}',
+                self.surface,
+                '',
+                self.closest_stations]
 
     @property
     def name(self):
@@ -111,3 +124,11 @@ class Bukken:
     @address_jp.setter
     def address_jp(self, value):
         self._address_jp = value
+
+    @property
+    def listing_link(self):
+        return self._listing_link
+
+    @listing_link.setter
+    def listing_link(self, value):
+        self._listing_link = value

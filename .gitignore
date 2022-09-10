@@ -7,3 +7,4 @@ gmaps_apikey
 bing_apikey
 .DS_Store
 yahoo_clientid
+output.csv

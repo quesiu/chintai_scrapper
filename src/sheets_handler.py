@@ -7,6 +7,12 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import bukken
+from enum_priority import Priority
+from homescojp_scrapper import HomescoojpScrapper as scrapper
+import yahoo_norikae_scrap as yns
+from dict_destinations import destinations
+
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -18,7 +24,8 @@ SHEET_RANGE_NAME = 'Test Retool!A:S'
 class SheetHandler:
 
     def __init__(self) -> None:
-        self.df = pd.DataFrame.empty
+        self.df_base = pd.DataFrame()
+        self.df_output = pd.DataFrame()
 
     def download_spreadsheet(self):
         """Shows basic usage of the Sheets API.
@@ -56,17 +63,38 @@ class SheetHandler:
                 print('No data found.')
                 return
 
-            self.df = pd.DataFrame(values)
-            self.df.to_csv('data.csv')
+            pd.DataFrame(values).to_csv('data.csv')
         except HttpError as err:
             print(err)
 
+    def initiate_df(self, nb_row_to_skip:int=0):
+        if not os.path.exists('data.csv'):
+            self.download_spreadsheet()
+        else:
+            print("file already exists")
+        self.df_base = pd.read_csv('data.csv', header=[0])
+
+
+    def loop_through_rows(self, gmh):
+        for row_idx in range(1, len(self.df_base)):
+            # Create a new bukken
+            current_bukken = bukken.Bukken()
+            # Get link from sheet (index 2)
+            link = self.df_base.iloc[row_idx][2]
+            current_bukken.listing_link = link
+            # Fill bukken with scrapping data
+            scrapper(link).scrap_all(current_bukken)
+            current_bukken.address_jp = gmh.reverse_geocode_jp(current_bukken.coordinates)
+            items_to_add = current_bukken.extract()
+
+            for destination in destinations.values():
+                items_to_add.append(yns.lookup_time_transfers(current_bukken.address_jp, destination, priority=Priority.Convenient.value))
+            new_row = pd.Series(items_to_add)
+            self.df_output = self.df_output.append(new_row, ignore_index=True)
+
 if __name__ == '__main__':
     # Only run spreadsheet reading if data doesn't exist to avoid unless API calls
-    if not os.path.exists('data.csv'):
-        sh = SheetHandler()
-        sh.download_spreadsheet()
-        pass
-    else:
-        print("file already exists")
+    sh = SheetHandler()
+    sh.initiate_df()
+    sh.loop_through_rows()
     
