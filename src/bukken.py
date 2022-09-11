@@ -2,6 +2,8 @@ from typing import List
 
 class Bukken:
     def __init__(self) -> None:
+        """Constructor for Bukken class: hold all information about a given property
+        """
         self._name = ''
         self._monthly_price = int(0)
         self._monthly_mgt_fees = int(0)

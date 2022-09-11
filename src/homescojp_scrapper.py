@@ -14,6 +14,11 @@ SURFACE_REGEX = r'(\d+\.?\d*)'
 
 class HomescoojpScrapper(RealEstateScrapper):
     def __init__(self, url: str):
+        """Constructor for Homes.co.jp scrapper
+
+        Args:
+            url (str): url to the homes.co.jp page to be scrapped
+        """
         super().__init__(url)
         self.soup = bs(self.return_content(), features='html.parser')
 

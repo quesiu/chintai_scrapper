@@ -1,12 +1,10 @@
 '''
-https://atooshi-note.com/python-yahoo-trans-scraping/
-現在時刻から直近の乗換案内を検索して、到着時間を表示する
-Yahoo乗換から到着時間をスクレイピングで抽出している
+Source: https://atooshi-note.com/python-yahoo-trans-scraping/
 '''
+import re
+import urllib.parse # To encode URLs
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup as bs
-import urllib.parse # URLエンコード、デコード
-import re
 
 NORIKAE_REGEX = r'(\d+)'
 TIME_REGEX = r'.+着(.+)'
@@ -15,8 +13,17 @@ TIME_REGEX = r'.+着(.+)'
 USER_AGENT = ('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36')
 
 def lookup_time_transfers(start_point:str, end_point:str, priority:int=0) -> str:
-    
-    #
+    """Generate URL and request to Yahoo Norikae to get useful information
+
+    Args:
+        start_point (str): departure address
+        end_point (str): arrival address
+        priority (int, optional): priority as defined in @enum_priority.py. Defaults to 0.
+
+    Returns:
+        str: _description_
+    """
+    # Only accept priorities between 0 and 2; see @enum_priority.py
     if priority < 0 or priority > 2:
         priority = 0
 
@@ -69,4 +76,3 @@ def get_total_time(soup) -> str:
     time = soup.select("li.time")
     time_res = re.search(TIME_REGEX, time[2].text)
     return time_res.group(1)
-

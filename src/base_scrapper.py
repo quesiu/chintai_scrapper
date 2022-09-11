@@ -1,14 +1,9 @@
-from pathlib import Path
-import shutil
 import os
+import shutil
 import requests
+from pathlib import Path
 from urllib.parse import urlparse
 from os.path import splitext, basename
-from bs4 import BeautifulSoup as bs
-# try:
-#     from googlesearch import search
-# except ImportError:
-#     print("Error: no module named 'google' found")
 
 # Header used to simulate request from browser and avoid robot blockers
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -16,28 +11,50 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleW
 class BaseScrapper:
     
     def __init__(self, url:str):
+        """Constructor for base scrapper class
+
+        Args:
+            url (str): url to the real estate property page to be scrapped
+        """
         self.url = url
         self.page = requests.get(url, allow_redirects=True, headers=HEADERS)
         self.extract_name_and_ext()
 
     def show_page(self):
+        """Display text in page
+        """
         print(self.page.text)
 
-    def return_text(self):
+    def return_text(self) -> str:
+        """Return text in page
+
+        Returns:
+            str: text
+        """
         return self.page.text
 
-    def return_content(self):
+    def return_content(self) -> str:
+        """Return content 
+
+        Returns:
+            str: content (to be scrapped)
+        """
         return self.page.content
 
     def extract_name_and_ext(self):
-        # Get site name and file extension
-        # Note: could be isolated in an utility class
+        # TODO: to be isolated in an utility class
+        """Get site name and file extension
+        """
         disassembled = urlparse(self.url)
         self.filename, self.ext = splitext(basename(disassembled.path))
 
     def create_folder(self, path:Path):
-        # Create folder whether it already exists or not
-        # Note: could be isolated in an utility class
+        """ Create folder whether it already exists or not
+
+        Args:
+            path (Path): path to the folder to be created
+        """
+        # TODO: to be isolated in an utility class
         if os.path.exists(path):
             shutil.rmtree(path)
         os.makedirs(path)

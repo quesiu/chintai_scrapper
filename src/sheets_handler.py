@@ -6,14 +6,12 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-import df2gspread as d2g
 
 import bukken
-from enum_priority import Priority
+import yahoo_norikae_scrap as yns
 from realestate_scrapper import RealEstateScrapper
 from homescojp_scrapper import HomescoojpScrapper
 from suumo_scrapper import SuumoScrapper
-import yahoo_norikae_scrap as yns
 from dict_destinations import destinations
 
 
@@ -28,10 +26,17 @@ OUTPUT_SHEET_RANGE_NAME = 'output!A:S'
 class SheetHandler:
 
     def __init__(self) -> None:
+        """Constructor for SheetHandler initializing empty data frames
+        """
         self.df_base = pd.DataFrame()
         self.df_output = pd.DataFrame()
 
-    def handle_credentials(self):
+    def handle_credentials(self) -> Credentials:
+        """Handle credentials for GoogleSheets via token.json file
+
+        Returns:
+            creds: Google credentials
+        """
         if os.path.exists('token.json'):
             creds = Credentials.from_authorized_user_file('token.json', SCOPES)
         # If there are no (valid) credentials available, let the user log in.
@@ -76,6 +81,10 @@ class SheetHandler:
             print(err)
 
     def upload_sheet(self):
+        #! Not functionning
+        """
+        Upload sheet back to GoogleSheet directly
+        """
         creds = creds = self.handle_credentials()
 
         try:
@@ -95,16 +104,26 @@ class SheetHandler:
             print(err)
 
     def initiate_df(self):
+        """Initiate/download pandas dataframe to avoid scrapping Google Sheets data
+        """
         if not os.path.exists('data.csv'):
             self.download_spreadsheet()
         else:
             print("file already exists")
         self.df_base = pd.read_csv('data.csv')
 
-    def detect_scrapper(self, link:str) -> RealEstateScrapper:
-        if 'homes.co.jp' in link:
+    def detect_scrapper(self, url:str) -> RealEstateScrapper:
+        """Detect and choose correct scrapper depending on url
+
+        Args:
+            link (str): url to the real estate property page to be scrapped
+
+        Returns:
+            RealEstateScrapper: suitable scrapper
+        """
+        if 'homes.co.jp' in url:
             return HomescoojpScrapper
-        elif 'suumo.jp' in link:
+        elif 'suumo.jp' in url:
             return SuumoScrapper
         else:
             exit

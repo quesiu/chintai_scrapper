@@ -1,5 +1,4 @@
 import googlemaps
-from datetime import datetime
 import yahoo_norikae_scrap as yns
 from enum_priority import Priority
 
@@ -8,6 +7,8 @@ LANG_EN = 'en'
 
 class GoogleMapsHandler:
     def __init__(self) -> None:
+        """Constructor for GoogleMapsHandler loading api_key from gmaps_apikey file
+        """
         filename = 'gmaps_apikey'
         api_key = self.get_file_contents(filename)
         self.gmaps = googlemaps.Client(key=api_key)

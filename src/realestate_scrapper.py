@@ -1,13 +1,18 @@
+from abc import ABC, abstractmethod
 from typing import Tuple
 from bukken import Bukken
 from base_scrapper import BaseScrapper
-from abc import ABC, abstractmethod
 
 # Part of the URL used to add a point to a given place
 GMAPS_URL = r'https://www.google.com/maps/place/'
 
 class RealEstateScrapper(ABC, BaseScrapper):
     def __init__(self, url: str):
+        """Constructor for abstract class RealEstateScrapper
+
+        Args:
+            url (str): url to the real estate prioperty page to be scrapped
+        """
         super().__init__(url)
 
     @abstractmethod

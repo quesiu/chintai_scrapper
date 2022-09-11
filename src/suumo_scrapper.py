@@ -1,6 +1,6 @@
 import re
-from typing import Tuple
 import requests
+from typing import Tuple
 from bs4 import BeautifulSoup as bs
 
 from bukken import Bukken
@@ -15,8 +15,13 @@ LONG_REGEX = r'"lng": (\d+.\d+)'
 EXTRA_FEES_REGEX = r'(\d+.?\d*万円|-)'
 
 class SuumoScrapper(RealEstateScrapper):
-
+    # TODO: Add support for pages that have to be scrapped differently, see example in __main__
     def __init__(self, url: str):
+        """Constructor for Suumo scrapper
+
+        Args:
+            url (str): url to the Suumo page to be scrapped
+        """
         super().__init__(url)
         self.soup = bs(self.return_content(), features='html.parser')
         # Need to access another page with map info to get coordinates
@@ -151,7 +156,7 @@ class SuumoScrapper(RealEstateScrapper):
 
 if __name__ == '__main__':
     scrapper = SuumoScrapper('https://suumo.jp/chintai/bc_100296177140/')
-    # sc = SuumoScrapper('https://suumo.jp/chintai/jnc_000027743441/?bc=100292549920')
+    # sc = SuumoScrapper('https://suumo.jp/chintai/jnc_000027743441/?bc=100292549920') # Different scrapping needed
     my_bukken = Bukken()
     scrapper.scrap_all(my_bukken)
     print(my_bukken)
