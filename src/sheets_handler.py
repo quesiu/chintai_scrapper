@@ -109,7 +109,7 @@ class SheetHandler:
         else:
             exit
 
-    def loop_through_rows(self, gmh):
+    def loop_through_rows(self, gmh, priority):
         # TODO refactor/extract in better way
         """Go through each row and scrap and calcualte required info
 
@@ -117,6 +117,7 @@ class SheetHandler:
             gmh (GoogleMapsHandler): handler for Google location APIs
         """
         for row_idx in range(1, len(self.df_base)):
+            #TODO: when already some data available on other index, skip the request?
             # Create a new bukken
             current_bukken = bukken.Bukken()
             # Get link from sheet (index 2)
@@ -129,7 +130,7 @@ class SheetHandler:
             items_to_add = current_bukken.extract()
 
             for destination in destinations.values():
-                items_to_add.append(yns.lookup_time_transfers(current_bukken.address_jp, destination, priority=Priority.Convenient.value))
+                items_to_add.append(yns.lookup_time_transfers(current_bukken.address_jp, destination, priority=priority))
             new_row = pd.Series(items_to_add)
             self.df_output = self.df_output.append(new_row, ignore_index=True)
 

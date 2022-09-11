@@ -70,7 +70,9 @@ class HomescoojpScrapper(RealEstateScrapper):
         reikin_res = re.search(EXTRA_FEES_REGEX, str(reikin_raw))
         if reikin_res:
             # Replace potential - by 0 and cast to int
-            total = int(reikin_res.group(1).replace('-', '0')) + int(reikin_res.group(2).replace('-', '0'))
+            reikin = int(reikin_res.group(1).replace('-', '0').replace('無', '0'))
+            shikikin = int(reikin_res.group(2).replace('-', '0').replace('無', '0'))
+            total = reikin + shikikin
         # Continue with hosho and other fees
         hosho_raw = self.soup.find(id= 'chk-bkc-moneyhoshoukyaku')
         hosho_res = re.search(EXTRA_FEES_REGEX, str(hosho_raw))

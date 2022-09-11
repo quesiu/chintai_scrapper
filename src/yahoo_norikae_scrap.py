@@ -27,7 +27,7 @@ def lookup_time_transfers(start_point:str, end_point:str, priority:int=0) -> str
     # Create the request URL
     url0 = 'https://transit.yahoo.co.jp/search/result?from='
     url1 = '&flatlon=&to='
-    url2 = f'&viacode=&viacode=&viacode=&shin=&ex=&hb=&al=&lb=&sr=&type=1&ws=3&s={priority}&ei=&fl=1&tl=3&expkind=1&ticket=ic&mtf=1&userpass=1&detour_id=&fromgid=&togid=&kw='
+    url2 = f'&viacode=&viacode=&viacode=&shin=&ex=&hb=&al=&lb=&sr=&y=2022&m=09&d=12&hh=09&m1=0&m2=4&type=1&ws=3&s={priority}&ei=&fl=1&tl=3&expkind=1&ticket=ic&mtf=1&userpass=1&detour_id=&fromgid=&togid=&kw='
     url = url0 + startstaen + url1 + endstaen + url2 + endstaen
 
     # Make the request, using a header and get the answer
