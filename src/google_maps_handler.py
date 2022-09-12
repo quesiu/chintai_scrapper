@@ -33,7 +33,14 @@ class GoogleMapsHandler:
             print("'%s' file not found" % filename)
 
     def reverse_geocode_jp(self, coordinates:str) -> str:
-        return self.gmaps.reverse_geocode(coordinates, language=LANG_JP)[0]['formatted_address']
+        try:
+            # Check if possible to cast coordinates to float
+            float(coordinates[0])
+            return self.gmaps.reverse_geocode(coordinates, language=LANG_JP)[0]['formatted_address']
+        except ValueError:
+            # Fallback and get 
+            return coordinates[0]
+       
 
 
 if __name__ == '__main__':

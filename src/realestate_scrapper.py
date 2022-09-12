@@ -51,6 +51,9 @@ class RealEstateScrapper(ABC, BaseScrapper):
     def scrap_age(self) -> str:
         pass
 
+    def fallback_coordinates(self) -> Tuple[str, str]:
+        pass
+
     def scrap_all(self, bukken:Bukken):
         """Fill up an bukken object with all scrapped
 

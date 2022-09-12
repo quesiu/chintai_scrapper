@@ -4,6 +4,7 @@ from typing import Tuple
 from bs4 import BeautifulSoup as bs
 
 from bukken import Bukken
+from google_maps_handler import GoogleMapsHandler
 from realestate_scrapper import RealEstateScrapper
 
 # Header used to simulate request from browser and avoid robot blockers
@@ -52,8 +53,15 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             Tuple[str, str]: latitude and longitude in this order
         """
-        lati = re.search(LAT__REGEX, str(self.map_soup)).group(1)
-        longi = re.search(LONG_REGEX, str(self.map_soup)).group(1)
+        lati = ''
+        longi = ''
+        lati_res = re.search(LAT__REGEX, str(self.map_soup))
+        longi_res = re.search(LONG_REGEX, str(self.map_soup))
+        if lati_res is not None and longi_res is not None:
+            lati = lati_res.group(1)
+            longi = longi_res.group(1)
+        else:
+            lati, longi = self.fallback_coordinates()
         return (lati, longi)
 
     def scrap_name(self) -> str:
@@ -84,8 +92,12 @@ class SuumoScrapper(RealEstateScrapper):
         self.monthly_price = monthly_price
         # All in one line for monthly fees
         # TODO clean it up, add intermediate function to separate both
-        monthly_fees_raw = self.soup.find_all('div', class_='property_data-body')[0]
-        monthly_fees = int(monthly_fees_raw.text.rstrip('万円').replace('-', '0'))
+        monthly_fees_raw = self.soup.find_all('div', class_='property_data-body')
+        if len(monthly_fees_raw) > 0:
+            monthly_fees_raw = monthly_fees_raw[0]
+            monthly_fees = int(monthly_fees_raw.text.rstrip('万円').replace('-', '0'))
+        else:
+            monthly_fees = -1
         return monthly_price, monthly_fees
 
     def scrap_other_fees(self) -> float:
@@ -96,14 +108,25 @@ class SuumoScrapper(RealEstateScrapper):
             float: extra fees in months
         """
         total_months = 0
-        reikin_shikikin_raw = self.soup.find_all('div', class_='property_data-body')[1].text
-        reikin_shikinkin_res = re.search(EXTRA_FEES_REGEX, reikin_shikikin_raw)
-        reikin = float(reikin_shikinkin_res.group(0).rstrip('万円').replace('-','0'))
-        shikikin = float(reikin_shikinkin_res.group(1).rstrip('万円').replace('-','0'))
-        hoken_raw = self.soup.find_all('div', class_='property_data-body')[2].text
-        hoken = float(hoken_raw.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t\t').rstrip('万円').replace('-','0'))
-        other_fees_raw = self.soup.find_all('div', class_='property_data-body')[3].text
-        other_fees = float(other_fees_raw.lstrip('r\n\t\t\t\t\t\t\t\t\t\t\t\t').rstrip('万円').replace('-','0'))
+        self.all_sub_info = self.soup.find_all('div', class_='property_data-body')
+        if len(self.all_sub_info) > 1:
+            reikin_shikikin_raw = self.all_sub_info[1].text
+            reikin_shikinkin_res = re.search(EXTRA_FEES_REGEX, reikin_shikikin_raw)
+            reikin = float(reikin_shikinkin_res.group(0).rstrip('万円').replace('-','0'))
+            shikikin = float(reikin_shikinkin_res.group(1).rstrip('万円').replace('-','0'))
+        else:
+            reikin = -1
+            shikikin = -1
+        if len(self.all_sub_info) > 2:
+            hoken_raw = self.all_sub_info[2].text
+            hoken = float(hoken_raw.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t\t').rstrip('万円').replace('-','0'))
+        else:
+            hoken = -1
+        if len(self.all_sub_info) > 3:
+            other_fees_raw = self.all_sub_info[3].text
+            other_fees = float(other_fees_raw.lstrip('r\n\t\t\t\t\t\t\t\t\t\t\t\t').rstrip('万円').replace('-','0'))
+        else:
+            other_fees = -1
         total = reikin + shikikin + hoken + other_fees
         if self.monthly_price == 0:
             print("Error, monthly price not correctly output so not possible to calculate fees in months")
@@ -119,12 +142,13 @@ class SuumoScrapper(RealEstateScrapper):
             str: stations listed with line return as separator
         """
         stations = ''
-        soup_of_stations = self.soup.find_all('div', class_='property_view_detail-body')[2]
-        stations_raw = soup_of_stations.find_all('div', class_='property_view_detail-text')
-        for station in stations_raw:
-            stations += f'{station.text}\n'
-        # Remove last line return
-        stations = stations[:-1]
+        if len(self.all_sub_info) > 2:
+            soup_of_stations = self.all_sub_info[2]
+            stations_raw = soup_of_stations.find_all('div', class_='property_view_detail-text')
+            for station in stations_raw:
+                stations += f'{station.text}\n'
+            # Remove last line return
+            stations = stations[:-1]
         return stations
 
     def scrap_bukken_type(self) -> str:
@@ -133,7 +157,10 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             str: type in Japanese
         """
-        return self.soup.find_all('div', class_='property_data-body')[7].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        bukken_type = ''
+        if len(self.all_sub_info) > 7:
+            bukken_type = self.all_sub_info[7].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        return bukken_type
 
     def scrap_madori(self) -> str:
         """Get bukken shape (1DK, 3LDK, etc.) which is called madori
@@ -141,7 +168,10 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             str: shape
         """
-        return self.soup.find_all('div', class_='property_data-body')[4].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        madori = ''
+        if len(self.all_sub_info) > 4:
+            madori = self.all_sub_info[4].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        return madori
 
     def scrap_surface(self) -> float:
         """Get surface
@@ -149,10 +179,28 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             float: surface in m2
         """
-        return float(self.soup.find_all('div', class_='property_data-body')[5].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t').rstrip('m2'))
+        surface = 0
+        if len(self.all_sub_info) > 5:
+            surface = self.all_sub_info[5].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t').rstrip('m2')
+        return float(surface)
     
     def scrap_age(self) -> str:
-        return self.soup.find_all('div', class_='property_data-body')[8].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        age = ''
+        if len(self.all_sub_info) > 8:
+           age = self.all_sub_info[8].text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t\t')
+        return age
+
+    def fallback_coordinates(self) -> Tuple[str, str]:
+        lati = ''
+        longi = ''
+        try:
+            address_tag = self.soup.find(text='所在地').parent.parent
+            lati = address_tag.find(class_="property_view_table-body").text
+        except AttributeError:
+            # No 所在地 element detected
+            pass
+        return (lati, longi)
+
 
 if __name__ == '__main__':
     scrapper = SuumoScrapper('https://suumo.jp/chintai/bc_100296177140/')
