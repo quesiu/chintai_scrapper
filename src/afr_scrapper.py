@@ -117,9 +117,12 @@ class AfrWebScrapper(RealEstateScrapper):
             str: type in Japanese
         """
         bukken_type = ''
-        bukken_type_raw = self.soup.find_all('dd', class_='bukken-info-detail-dd')
-        if len(bukken_type_raw) > 0:
-            bukken_type = bukken_type_raw[0].text
+        bukken_text = self.soup.find(text='物件種別')
+        if bukken_text is not None:
+            bukken_section = bukken_text.parent.parent
+            bukken_type_raw = bukken_section.find('dd', class_='bukken-info-detail-dd')
+            if bukken_type_raw is not None:
+                bukken_type = bukken_type_raw.text
         return bukken_type
 
     def scrap_madori(self) -> str:
@@ -156,7 +159,7 @@ class AfrWebScrapper(RealEstateScrapper):
         return age
 
 if __name__ == '__main__':
-    scrapper = AfrWebScrapper('https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B20211896201')
+    scrapper = AfrWebScrapper('https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B20211920201')
     my_bukken = Bukken()
     scrapper.scrap_all(my_bukken)
     print(my_bukken)
