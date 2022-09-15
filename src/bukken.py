@@ -39,7 +39,9 @@ class Bukken:
                 f'={self.monthly_price}*(24+4+{self.extra_fees_in_months})/24+{self.monthly_mgt_fees}',
                 self.surface,
                 '',
-                self._bukken_type,
+                self.age,
+                self.bukken_type,
+                self.madori,
                 self.closest_stations]
 
     @property

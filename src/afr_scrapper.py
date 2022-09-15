@@ -1,5 +1,4 @@
 import re
-import requests
 from typing import Tuple
 from bs4 import BeautifulSoup as bs
 

@@ -8,6 +8,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 import bukken
+from enum_priority import Priority
+from google_maps_handler import GoogleMapsHandler
 import yahoo_norikae_scrap as yns
 from realestate_scrapper import RealEstateScrapper
 from homescojp_scrapper import HomescoojpScrapper
@@ -131,7 +133,7 @@ class SheetHandler:
         else:
             exit
 
-    def loop_through_rows(self, gmh, priority):
+    def loop_through_rows(self, gmh:GoogleMapsHandler):
         # TODO refactor/extract in better way
         """Go through each row and scrap and calcualte required info
 
@@ -151,8 +153,13 @@ class SheetHandler:
             current_bukken.address_jp = gmh.reverse_geocode_jp(current_bukken.coordinates)
             items_to_add = current_bukken.extract()
 
+            # Add fastest
             for destination in destinations.values():
-                items_to_add.append(yns.lookup_time_transfers(current_bukken.address_jp, destination, priority=priority))
+                items_to_add.append(yns.lookup_time_transfers(current_bukken.address_jp, destination, priority=Priority.Fast.value))
+            # Also add most convenient
+            for destination in destinations.values():
+                items_to_add.append(yns.lookup_time_transfers(current_bukken.address_jp, destination, priority=Priority.Convenient.value))
+
             new_row = pd.Series(items_to_add)
             self.df_output = self.df_output.append(new_row, ignore_index=True)
 

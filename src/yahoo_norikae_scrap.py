@@ -60,9 +60,13 @@ def get_nb_transfers(soup) -> str:
     Returns:
         str: transfers as a string
     """
-    transfers = soup.select_one("li.transfer").text
-    transfers_res = re.search(NORIKAE_REGEX, transfers)
-    return f'乗換:{int(transfers_res.group(1))}'
+    transfers_return = -1
+    transfers_raw = soup.select_one("li.transfer")
+    if transfers_raw is not None:
+        transfers = transfers_raw.text
+        transfers_res = re.search(NORIKAE_REGEX, transfers)
+        transfers_return = int(transfers_res.group(1))
+    return f'乗換:{transfers_return}'
 
 def get_total_time(soup) -> str:
     """Get total amount of time the commute takes from parsed Yahoo Norikae Annai page
@@ -73,9 +77,12 @@ def get_total_time(soup) -> str:
     Returns:
         str: total time as a string with extra info
     """
-    time = soup.select("li.time")
-    time_res = re.search(TIME_REGEX, time[2].text)
-    return time_res.group(1)
+    time_return = ''
+    time_raw = soup.select("li.time")
+    if len(time_raw) > 2:
+        time_res = re.search(TIME_REGEX, time_raw[2].text)
+        time_return = time_res.group(1)
+    return time_return
 
 if __name__ == '__main__':
     pass

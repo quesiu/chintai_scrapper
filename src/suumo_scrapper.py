@@ -4,7 +4,6 @@ from typing import Tuple
 from bs4 import BeautifulSoup as bs
 
 from bukken import Bukken
-from google_maps_handler import GoogleMapsHandler
 from realestate_scrapper import RealEstateScrapper
 
 # Header used to simulate request from browser and avoid robot blockers

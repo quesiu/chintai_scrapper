@@ -43,8 +43,11 @@ class HomescoojpScrapper(RealEstateScrapper):
         Returns:
             str: name of the property_bukken
         """
+        name = ''
         name_raw = self.soup.find(class_ = 'bukkenName')
-        return name_raw.text
+        if name_raw is not None:
+            name = name_raw.text
+        return name
 
     def scrap_price(self) -> Tuple[int, int]:
         """Get price from Homes.co.jp page
@@ -94,13 +97,15 @@ class HomescoojpScrapper(RealEstateScrapper):
             str: stations listed with line return as separator
         """
         stations = ''
-        stations_raw = self.soup.find(id= 'chk-bkc-fulltraffic').find_all("p")
-        for idx, station in enumerate(stations_raw):
-            # Add a line return character
-            stations += f'{station.text}\n'
-            if idx == 2:
-                stations = stations[:-1]
-                break
+        stations_raw = self.soup.find(id= 'chk-bkc-fulltraffic')
+        if stations_raw is not None:
+            stations_list = stations_raw.find_all("p")
+            for idx, station in enumerate(stations_list):
+                # Add a line return character
+                stations += f'{station.text}\n'
+                if idx == 2:
+                    stations = stations[:-1]
+                    break
         return stations
     
     def scrap_bukken_type(self) -> str:
@@ -109,7 +114,11 @@ class HomescoojpScrapper(RealEstateScrapper):
         Returns:
             str: type in Japanese
         """
-        return self.soup.find(id='chk-bkh-type').text
+        bukken_type = ''
+        bukken_raw = self.soup.find(id='chk-bkh-type')
+        if bukken_raw is not None:
+            bukken_type = bukken_raw.text
+        return bukken_type
 
     def scrap_madori(self) -> str:
         """Get bukken shape (1DK, 3LDK, etc.) which is called madori
@@ -117,9 +126,13 @@ class HomescoojpScrapper(RealEstateScrapper):
         Returns:
             str: shape
         """
-        madori_raw = self.soup.find(id='chk-bkc-marodi').text
-        madori_res = re.search(MADORI_REGEX, str(madori_raw))
-        return madori_res.group(1)
+        madori = ''
+        madori_raw = self.soup.find(id='chk-bkc-marodi')
+        if madori_raw is not None:
+            madori_res = re.search(MADORI_REGEX, str(madori_raw.text))
+            if madori_res is not None:
+                madori = madori_res.group(1)
+        return madori
 
     def scrap_surface(self) -> float:
         """Get surface
@@ -127,9 +140,12 @@ class HomescoojpScrapper(RealEstateScrapper):
         Returns:
             float: surface in m2
         """
-        surface_raw = self.soup.find(id='chk-bkc-housearea').text
-        surface_res = re.search(SURFACE_REGEX, str(surface_raw))
-        return float(surface_res.group(1))
+        surface = 0
+        surface_raw = self.soup.find(id='chk-bkc-housearea')
+        if surface_raw is not None:
+            surface_res = re.search(SURFACE_REGEX, str(surface_raw.text))
+            surface = float(surface_res.group(1))
+        return surface
 
     def scrap_age(self) -> str:
         """Get bukken age
@@ -137,7 +153,11 @@ class HomescoojpScrapper(RealEstateScrapper):
         Returns:
             str: age in Japanese
         """
-        return self.soup.find(id='chk-bkc-kenchikudate').text
+        age = ''
+        age_raw = self.soup.find(id='chk-bkc-kenchikudate')
+        if age_raw is not None:
+            age = age_raw.text
+        return age
 
 if __name__ == "__main__":
     scrapper = HomescoojpScrapper('https://www.homes.co.jp/chintai/b-1438180002881/')
