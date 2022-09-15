@@ -106,25 +106,25 @@ class SheetHandler:
         except HttpError as err:
             print(err)
 
-    def initiate_df(self):
+    def initiate_df(self, url:str=''):
         """Initiate/download pandas dataframe to avoid scrapping Google Sheets data
-        """
-        if not os.path.exists('data.csv'):
-            self.download_spreadsheet()
-        else:
-            print("file already exists")
-        self.df_base = pd.read_csv('data.csv')
-
-    def initiate_df(self, url:str):
-        """Initiatie pandas dataframe with only one link
 
         Args:
-            url (str): link to page to scrap
+            url (str): optional url to only scrap one page
         """
-        # Prepare data in a certain way to make the script work properly
-        data = [{'Header': 0, 'Name': 0, 'Link': 0}, 
-                {'Header': 0, 'Name': 0, 'Link': url}]
-        self.df_base = pd.DataFrame(data)
+        if url != '':
+            # Prepare data in a certain way to make the script work properly
+            data = [{'Header': 0, 'Name': 0, 'Link': 0}, 
+                    {'Header': 0, 'Name': 0, 'Link': url}]
+            self.df_base = pd.DataFrame(data)
+        else:
+            # Download file if not existing
+            if not os.path.exists('data.csv'):
+                self.download_spreadsheet()
+            else:
+                # Use existing data.csv
+                print("file already exists")
+            self.df_base = pd.read_csv('data.csv')
 
     def detect_scrapper(self, url:str) -> RealEstateScrapper:
         """Detect and choose correct scrapper depending on url
