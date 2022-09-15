@@ -115,6 +115,17 @@ class SheetHandler:
             print("file already exists")
         self.df_base = pd.read_csv('data.csv')
 
+    def initiate_df(self, url:str):
+        """Initiatie pandas dataframe with only one link
+
+        Args:
+            url (str): link to page to scrap
+        """
+        # Prepare data in a certain way to make the script work properly
+        data = [{'Header': 0, 'Name': 0, 'Link': 0}, 
+                {'Header': 0, 'Name': 0, 'Link': url}]
+        self.df_base = pd.DataFrame(data)
+
     def detect_scrapper(self, url:str) -> RealEstateScrapper:
         """Detect and choose correct scrapper depending on url
 
