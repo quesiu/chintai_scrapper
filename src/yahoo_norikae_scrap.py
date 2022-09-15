@@ -76,3 +76,6 @@ def get_total_time(soup) -> str:
     time = soup.select("li.time")
     time_res = re.search(TIME_REGEX, time[2].text)
     return time_res.group(1)
+
+if __name__ == '__main__':
+    pass

@@ -10,8 +10,8 @@ from realestate_scrapper import RealEstateScrapper
 # Header used to simulate request from browser and avoid robot blockers
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-# Regex to catch latitude and longitude for Homes
-LAT__REGEX = r'"lat": (\d+.\d+)'
+# Regex to catch latitude and longitude for Suumo
+LAT_REGEX = r'"lat": (\d+.\d+)'
 LONG_REGEX = r'"lng": (\d+.\d+)'
 EXTRA_FEES_REGEX = r'(\d+.?\d*万円|-)'
 
@@ -55,7 +55,7 @@ class SuumoScrapper(RealEstateScrapper):
         """
         lati = ''
         longi = ''
-        lati_res = re.search(LAT__REGEX, str(self.map_soup))
+        lati_res = re.search(LAT_REGEX, str(self.map_soup))
         longi_res = re.search(LONG_REGEX, str(self.map_soup))
         if lati_res is not None and longi_res is not None:
             lati = lati_res.group(1)
@@ -75,7 +75,7 @@ class SuumoScrapper(RealEstateScrapper):
         return name_raw.text.lstrip('\r\n\t\t\t').rstrip('                        ')
 
     def scrap_price(self) -> Tuple[int, int]:
-        """Get price from Homes.co.jp page
+        """Get price from Suumo page
 
         Returns:
             Tuple[int, int]: price in JPY, with monthly rent and monthly fees in this order

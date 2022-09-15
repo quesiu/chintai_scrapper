@@ -12,6 +12,7 @@ import yahoo_norikae_scrap as yns
 from realestate_scrapper import RealEstateScrapper
 from homescojp_scrapper import HomescoojpScrapper
 from suumo_scrapper import SuumoScrapper
+from afr_scrapper import AfrWebScrapper
 from dict_destinations import destinations
 
 
@@ -125,6 +126,8 @@ class SheetHandler:
             return HomescoojpScrapper
         elif 'suumo.jp' in url:
             return SuumoScrapper
+        elif 'afr-web.co.jp' in url:
+            return AfrWebScrapper
         else:
             exit
 
