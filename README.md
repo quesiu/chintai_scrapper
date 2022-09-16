@@ -27,6 +27,7 @@ pip install -r requirements.txt
 2. Change *dict_directions* or add elements by using Google Maps and right clicking on interest points and choosing the coordinates. Paste them in the list.
 3. Change Priority to Fast, Cheap or Convenient in *main.py*.
 4. Run *main.py*
+5. Alternatively, copy a listing URL and paste it in *main_one_link.py* and run the file to get only one output.
 
 ## Known bugs
 
