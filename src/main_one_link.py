@@ -12,8 +12,8 @@ def fill_sheet_with_info(url:str):
     sh.initiate_df(url)
     sh.loop_through_rows(gmh)
     # sh.upload_sheet()
-    sh.df_output.to_csv('output_one.csv', index=False, header=False)
+    sh.df_output.to_csv('output_one.csv', index=False, header=False, encoding='utf-8-sig')
 
 if __name__ == '__main__':
-    fill_sheet_with_info('https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B20211740103')
+    fill_sheet_with_info('https://suumo.jp/chintai/bc_100297628658/')
     print('Succesfully output data')

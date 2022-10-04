@@ -12,7 +12,7 @@ def fill_sheet_with_info():
     sh.initiate_df()
     sh.loop_through_rows(gmh)
     # sh.upload_sheet()
-    sh.df_output.to_csv('output.csv', index=False, header=False)
+    sh.df_output.to_csv('output.csv', index=False, header=False, encoding='utf-8-sig')
 
 if __name__ == '__main__':
     fill_sheet_with_info()
