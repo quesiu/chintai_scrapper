@@ -69,9 +69,12 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             str: name of the header
         """
+        name = ''
         name_raw = self.soup.find(class_ = 'section_h1-header-title')
-        # Remove potential leading or trailing whitespaces
-        return name_raw.text.lstrip('\r\n\t\t\t').rstrip('                        ')
+        if name_raw is not None:
+            # Remove potential leading or trailing whitespaces
+            name = name_raw.text.lstrip('\r\n\t\t\t').rstrip('                        ')
+        return name
 
     def scrap_price(self) -> Tuple[int, int]:
         """Get price from Suumo page
@@ -79,15 +82,17 @@ class SuumoScrapper(RealEstateScrapper):
         Returns:
             Tuple[int, int]: price in JPY, with monthly rent and monthly fees in this order
         """
+        monthly_price = 0
         monthly_price_raw = self.soup.find('div', class_= 'property_view_main-emphasis')
         if monthly_price_raw is None:
             # Backup check for span instead of div
             monthly_price_raw = self.soup.find('span', class_= 'property_view_note-emphasis')
-        # Remove useless chracters
-        monthly_price = monthly_price_raw.text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t').rstrip('万円')
-        # Cast into int and convert 1万 to 10000JPY
-        monthly_price = int(float(monthly_price) * 10000)
-        # Also add monthly price info to calculate extra fees in months
+            # Remove useless chracters
+        if monthly_price_raw is not None:
+            monthly_price = monthly_price_raw.text.lstrip('\r\n\t\t\t\t\t\t\t\t\t\t').rstrip('万円')
+            # Cast into int and convert 1万 to 10000JPY
+            monthly_price = int(float(monthly_price) * 10000)
+            # Also add monthly price info to calculate extra fees in months
         self.monthly_price = monthly_price
         # All in one line for monthly fees
         # TODO clean it up, add intermediate function to separate both
@@ -193,7 +198,7 @@ class SuumoScrapper(RealEstateScrapper):
         lati = ''
         longi = ''
         try:
-            address_tag = self.soup.find(text='所在地').parent.parent
+            address_tag = self.soup.find(text='所在地').parent
             lati = address_tag.find(class_="property_view_table-body").text
         except AttributeError:
             # No 所在地 element detected
