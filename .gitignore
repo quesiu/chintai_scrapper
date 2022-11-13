@@ -10,3 +10,4 @@ yahoo_clientid
 output.csv
 output_one.csv
 .streamlit/config.toml
+config_chintai.json
