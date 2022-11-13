@@ -1,19 +1,19 @@
 from google_maps_handler import GoogleMapsHandler
-from sheets_handler import SheetHandler
+from dataframe_handler import DataFrameHandler
 
-def fill_sheet_with_info():
-    # TODO: Refactor with Sheets Handler
+def fill_dataframe_with_info():
+    # TODO: Refactor with DataFrameHandler
     """Main function that initialize and run all scripts
     """
     # Initialize different objects
     gmh = GoogleMapsHandler()
-    sh = SheetHandler()
+    dfh = DataFrameHandler()
 
-    sh.initiate_df()
-    sh.loop_through_rows(gmh)
+    dfh.initiate_df()
+    dfh.loop_through_rows(gmh)
     # sh.upload_sheet()
-    sh.df_output.to_csv('output.csv', index=False, header=False, encoding='utf-8-sig')
+    dfh.df_output.to_csv('output.csv', index=False, header=False, encoding='utf-8-sig')
 
 if __name__ == '__main__':
-    fill_sheet_with_info()
+    fill_dataframe_with_info()
     print('Succesfully output data')

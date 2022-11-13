@@ -26,10 +26,10 @@ SPREADSHEET_ID = '1b7b5a74pHrAqkd3OdLA83ydJSLutQonDO_Yf-XAWNo0'
 INPUT_SHEET_RANGE_NAME = 'House and info (auto)!A:S'
 OUTPUT_SHEET_RANGE_NAME = 'output!A:S'
 
-class SheetHandler:
+class DataFrameHandler:
 
     def __init__(self) -> None:
-        """Constructor for SheetHandler initializing empty data frames
+        """Constructor for DataFrameHandler initializing empty data frames
         """
         self.df_base = pd.DataFrame()
         self.df_output = pd.DataFrame()
@@ -176,8 +176,8 @@ class SheetHandler:
 
 if __name__ == '__main__':
     # Only run spreadsheet reading if data doesn't exist to avoid unless API calls
-    # sh = SheetHandler()
-    # sh.initiate_df()
-    # sh.loop_through_rows()
+    # dfh = DataFrameHandler()
+    # dfh.initiate_df()
+    # dfh.loop_through_rows()
     # print('Succesfully output data')
     pass

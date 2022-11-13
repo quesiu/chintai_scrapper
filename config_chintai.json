@@ -1,0 +1,1 @@
+{"transit_fast": true, "transit_cheap": false, "transit_convenient": true, "conditional_formatting": {"monthly_price_cf": {"dark_red": 260000, "red": 240000, "orange": 220000, "blue_green": 200000}, "surface_cf": {"dark_red": 40, "red": 45, "orange": 50, "blue_green": 55}, "price_m2_cf": {"dark_red": 5000, "red": 4500, "orange": 4000, "blue_green": 3500}}}
