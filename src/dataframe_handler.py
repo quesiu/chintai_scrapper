@@ -106,16 +106,18 @@ class DataFrameHandler:
         except HttpError as err:
             print(err)
 
-    def initiate_df(self, url:str=''):
+    def initiate_df(self, urls_input:str=''):
         """Initiate/download pandas dataframe to avoid scrapping Google Sheets data
 
         Args:
             url (str): optional url to only scrap one page
         """
-        if url != '':
+        if urls_input is not None or urls_input != '':
             # Prepare data in a certain way to make the script work properly
-            data = [{'Header': 0, 'Name': 0, 'Link': 0}, 
-                    {'Header': 0, 'Name': 0, 'Link': url}]
+            data = []
+            urls = urls_input.splitlines()
+            for url in urls:
+                data.append({'Header': 0, 'Name': 0, 'Link': url})
             self.df_base = pd.DataFrame(data)
         else:
             # Download file if not existing
@@ -151,7 +153,7 @@ class DataFrameHandler:
         Args:
             gmh (GoogleMapsHandler): handler for Google location APIs
         """
-        for row_idx in range(1, len(self.df_base)):
+        for row_idx in range(0, len(self.df_base)):
             #TODO: when already some data available on other index, skip the request?
             # Create a new bukken
             current_bukken = bukken.Bukken()

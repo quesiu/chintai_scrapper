@@ -12,7 +12,7 @@ from dataframe_handler import DataFrameHandler
 # LAT_LONG_REGEX = r'{\"lat\":\"(\d*\.\d*)\",\"lng\":\"(\d*.\d*)\"}'
 ICON_URL = "https://upload.wikimedia.org/wikipedia/commons/0/01/Geokey.svg"
 
-def fill_dataframe_with_info(url:str) -> pd.DataFrame:
+def fill_dataframe_with_info(urls:str) -> pd.DataFrame:
     # TODO: Refactor with Sheets Handler
     """Main function that initialize and run all scripts
     """
@@ -20,7 +20,7 @@ def fill_dataframe_with_info(url:str) -> pd.DataFrame:
     gmh = GoogleMapsHandler()
     sh = DataFrameHandler()
 
-    sh.initiate_df(url)
+    sh.initiate_df(urls)
     sh.loop_through_rows(gmh)
     # sh.upload_sheet()
     # sh.df_output.to_csv('output_one.csv', index=False, header=False, encoding='utf-8-sig')    
@@ -40,11 +40,13 @@ def generate_gui():
         generate_settings()
     else:
         print("Error: not possible to display current page")
-    # display_results(url_input)
+    display_results(
+        '''https://suumo.jp/chintai/jnc_000076217981/
+https://suumo.jp/chintai/jnc_000050158310/''')
 
 def generate_home():
-    url_input = st.text_input(label="Paste property URL page below")
-    st.button("Analyze property", on_click=display_results, args=[url_input])
+    urls_input = st.text_area(label="Paste property URL page below", help="Add one or several links (one per line) and click on the button to analyze them")
+    st.button("Analyze properties", on_click=display_results, args=[urls_input])
 
 def generate_settings():
     # TODO: refactor file check in a better way
@@ -100,11 +102,12 @@ def init_json_config(f:io.TextIOWrapper) -> str:
     }
     return json.dump(init_conf, f)
 
-def display_results(url_input:str):
+def display_results(urls_input:str):
     # print(f'{url_input} is of type {type(url_input)}')
-    if url_input is None or url_input is '':
-        url_input = 'https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B201334160402'
-    df = fill_dataframe_with_info(url_input)
+    if urls_input is None or urls_input[0] is '':
+        urls_input = 'https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B201334160402'
+    df = fill_dataframe_with_info(urls_input)
+    
     df = add_custom_headers(df)
     # Display DataFrame as table using streamlit
     st.write(df)
@@ -124,6 +127,7 @@ def add_custom_headers(df:pd.DataFrame) -> pd.DataFrame:
 def generate_map(df:pd.DataFrame):
     # TODO: add coordinates to DataFrame; add option to not display it
     # lati, longi = coordinates
+    map_data = pd.DataFrame
     data = pd.DataFrame(
         {   'Name': [df.loc[0].at['Name']],
             'Link': [df.loc[0].at['Link']],
