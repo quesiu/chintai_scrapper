@@ -40,9 +40,9 @@ def generate_gui():
         generate_settings()
     else:
         print("Error: not possible to display current page")
-    display_results(
-        '''https://suumo.jp/chintai/jnc_000076217981/
-https://suumo.jp/chintai/jnc_000050158310/''')
+#     display_results(
+#         '''https://suumo.jp/chintai/jnc_000076217981/
+# https://suumo.jp/chintai/jnc_000050158310/''')
 
 def generate_home():
     urls_input = st.text_area(label="Paste property URL page below", help="Add one or several links (one per line) and click on the button to analyze them")
@@ -125,15 +125,14 @@ def add_custom_headers(df:pd.DataFrame) -> pd.DataFrame:
     return df
 
 def generate_map(df:pd.DataFrame):
-    # TODO: add coordinates to DataFrame; add option to not display it
+    # TODO: add coordinates to DataFrame; add option to stot display it
     # lati, longi = coordinates
-    map_data = pd.DataFrame
-    data = pd.DataFrame(
-        {   'Name': [df.loc[0].at['Name']],
-            'Link': [df.loc[0].at['Link']],
-            'latitude': [float(df.loc[0].at["Maps"][34:49])],
-            'longitude': [float(df.loc[0].at["Maps"][52:])]
-        })
+    data = pd.DataFrame()
+    data['Name'] = df['Name']
+    data['Link'] = df['Link']
+    # Extract coordinates by only taking relevant characters from GoogleMaps link
+    data['latitude'] = df['Maps'].apply(lambda x:float(x[34:49]))
+    data['longitude'] = df['Maps'].apply(lambda x:float(x[52:]))
     st.map(data = data)
     # Add icon to all objects
     # icon_data = {
