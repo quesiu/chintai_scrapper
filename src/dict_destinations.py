@@ -1,9 +1,4 @@
+## Here add all interesting destinations from which commuting time will automatically calculated, separated by commas
 destinations = {
-    'amita': '日本、〒101-0045 東京都千代田区神田鍛冶町３丁目６−７',
-    'mcp': '１丁目-６-1 大手町 千代田区 東京都 100-0004 日本',
-    'shinagawa': '日本、〒108-0075 東京都港区港南２丁目１',
-    'xtia': '日本、〒140-0002 東京都品川区東品川３丁目３２−４２',
-    'recursive': '日本、〒150-0013 東京都渋谷区恵比寿１丁目１９−１９',
-    'ikebukuro': '日本、〒171-0022 東京都豊島区南池袋１丁目２８−２',
-    'musashi_urawa': '日本、〒336-0021 埼玉県さいたま市南区別所７丁目１２ 武蔵浦和駅',
+    
 }

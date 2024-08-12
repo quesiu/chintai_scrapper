@@ -5,6 +5,8 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 from streamlit_option_menu import option_menu
+from streamlit_folium import st_folium
+import folium
 # Custom libraries
 from google_maps_handler import GoogleMapsHandler
 from dataframe_handler import DataFrameHandler
@@ -40,6 +42,7 @@ def generate_gui():
         generate_settings()
     else:
         print("Error: not possible to display current page")
+    display_results('https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B200400640101')
 #     display_results(
 #         '''https://suumo.jp/chintai/jnc_000076217981/
 # https://suumo.jp/chintai/jnc_000050158310/''')
@@ -104,7 +107,7 @@ def init_json_config(f:io.TextIOWrapper) -> str:
 
 def display_results(urls_input:str):
     # print(f'{url_input} is of type {type(url_input)}')
-    if urls_input is None or urls_input[0] is '':
+    if urls_input is None:
         urls_input = 'https://www.afr-web.co.jp/hebel-rooms/search/detail/?clientcorp_room_cd=B201334160402'
     df = fill_dataframe_with_info(urls_input)
     
@@ -133,6 +136,12 @@ def generate_map(df:pd.DataFrame):
     # Extract coordinates by only taking relevant characters from GoogleMaps link
     data['latitude'] = df['Maps'].apply(lambda x:float(x[34:49]))
     data['longitude'] = df['Maps'].apply(lambda x:float(x[52:]))
+
+    # m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=15)
+    # for i, row in data.iterrows():
+    #     folium.Marker(location=[row['latitude'], row['longitude']], popup=f"<a href={row['Link']}>{row['Name']}</a>").add_to(m)
+
+    # st_folium(m)
     st.map(data = data)
     # Add icon to all objects
     # icon_data = {
@@ -145,8 +154,7 @@ def generate_map(df:pd.DataFrame):
     # for i in data.index:
     #     data["icon_data"][i] = icon_data
 
-    # longi = float(df.loc[0].at["Maps"][34:49])
-    # lati = float(df.loc[0].at["Maps"][52:])
+    
     # # view_state = pdk.data_utils.compute_view(data[["longitude", "latitude"]], 0.1)
     # # view_state = pdk.ViewState(longitude=longi, latitude=lati)
 
@@ -156,10 +164,12 @@ def generate_map(df:pd.DataFrame):
     #     get_icon="icon_data",
     #     get_size=4,
     #     size_scale=15,
+    #     get_position=["longitude", "latitude"],
     #     pickable=True,
     # )
 
-    # r = pdk.Deck(layers=[icon_layer], api_keys=MAPBOX_API_KEY, map_provider='mapbox', tooltip={"text": "{Name}"})
+    # pdk.Deck(layers=[icon_layer], tooltip={"text": "{Name}"})
+    # pdk.Deck(layers=[icon_layer], api_keys=MAPBOX_API_KEY, map_provider='mapbox', tooltip={"text": "{Name}"})
 
     # st.pydeck_chart(
     #         r
